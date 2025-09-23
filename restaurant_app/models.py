@@ -35,6 +35,14 @@ class Review(models.Model):
 
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    full_name = models.CharField(max_length=255)
+    phone_number = models.CharField(max_length=20)
+    address = models.CharField(max_length=255)
+    PAYMENT_CHOICES = [
+        ('cash', 'Готівка при отриманні'),
+        ('online', 'Онлайн оплата'),
+    ]
+    payment_method = models.CharField(max_length=10, choices=PAYMENT_CHOICES)
     STATUS_CHOICES = [
         ('pending', 'Очікує підтвердження'),
         ('in_progress', 'В роботі'),

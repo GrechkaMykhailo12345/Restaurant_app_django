@@ -21,7 +21,7 @@ class ReviewAdmin(admin.ModelAdmin):
     def approve_reviews(self, request, queryset):
         queryset.update(is_approved=True)
     approve_reviews.short_description = "Схвалити обрані відгуки"
-@admin.register(DishesinOrder)
+
 class DishesinOrderInline(admin.TabularInline):
     model = DishesinOrder
     extra = 0
