@@ -1,0 +1,47 @@
+{% extends "restaurant_app/base.html" %}
+
+{% block title %}Головна{% endblock %}
+
+{% block content %}
+    <h1>Ласкаво просимо до нашого ресторану!</h1>
+
+    <section>
+        <h2>Популярні страви</h2>
+        <div style="display: flex; gap: 20px;">
+            {% for dish in popular_dishes %}
+                <div class="dish-card" style="width: 30%;">
+                    {% if dish.image %}
+                        <img src="{{ dish.image.url }}" alt="{{ dish.name }}" style="max-width: 100%; height: auto;">
+                    {% endif %}
+                    <h3><a href="{% url 'dish_detail' dish.id %}">{{ dish.name }}</a></h3>
+                    <p>{{ dish.description|truncatechars:100 }}</p>
+                    <p><strong>Ціна: {{ dish.price }} грн</strong></p>
+                    <a href="{% url 'cart_add' dish.id %}" class="button">В кошик</a>
+                </div>
+            {% empty %}
+                <p>Наразі популярних страв немає.</p>
+            {% endfor %}
+        </div>
+    </section>
+    
+    <hr>
+
+    <section>
+        <h2>Нові пропозиції</h2>
+        <div style="display: flex; gap: 20px;">
+            {% for dish in new_dishes %}
+                <div class="dish-card" style="width: 30%;">
+                    {% if dish.image %}
+                        <img src="{{ dish.image.url }}" alt="{{ dish.name }}" style="max-width: 100%; height: auto;">
+                    {% endif %}
+                    <h3><a href="{% url 'dish_detail' dish.id %}">{{ dish.name }}</a></h3>
+                    <p>{{ dish.description|truncatechars:100 }}</p>
+                    <p><strong>Ціна: {{ dish.price }} грн</strong></p>
+                    <a href="{% url 'cart_add' dish.id %}" class="button">В кошик</a>
+                </div>
+            {% empty %}
+                <p>Наразі нових пропозицій немає.</p>
+            {% endfor %}
+        </div>
+    </section>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "restaurant_app/base.html" %}
+
+{% block title %}Меню Ресторану{% endblock %}
+
+{% block content %}
+    <h1>Меню Ресторану</h1>
+
+    <div class="category-filter" style="margin-bottom: 25px;">
+        <h3>Фільтр за категорією:</h3>
+        
+        <a href="{% url 'menu_list' %}" 
+           class="category-link {% if not selected_category %}active-category{% endif %}">
+            Усі
+        </a>
+        
+        {% for category in categories %}
+            <a href="{% url 'menu_list' %}?category={{ category.id }}" 
+               class="category-link {% if category.id|stringformat:"s" == selected_category|stringformat:"s" %}active-category{% endif %}">
+                {{ category.name }}
+            </a>
+        {% endfor %}
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+        {% for dish in dishes %}
+            <div class="dish-card">
+                {% if dish.image %}
+                    <a href="{% url 'dish_detail' dish.id %}">
+                        <img src="{{ dish.image.url }}" alt="{{ dish.name }}" style="max-width: 100%; height: auto; border-radius: 5px;">
+                    </a>
+                {% endif %}
+                
+                <h4 style="color: gray;">{{ dish.category.name }}</h4>
+                <h3><a href="{% url 'dish_detail' dish.id %}">{{ dish.name }}</a></h3>
+                
+                <p>{{ dish.description|truncatechars:100 }}</p>
+
+                <p style="font-size: 1.3em;">Ціна: <strong>{{ dish.price }} грн</strong></p>
+                
+                <div style="margin-top: 10px;">
+                    {% if dish.is_available %}
+                        <p style="color: green; display: inline-block; margin-right: 15px;">В наявності</p>
+                        <a href="{% url 'cart_add' dish.id %}" 
+                           style="background-color: green; color: white; padding: 8px 12px; text-decoration: none; border-radius: 4px;">
+                           Додати до кошика
+                        </a>
+                    {% else %}
+                        <p style="color: red;">Немає в наявності</p>
+                        <button disabled style="padding: 8px 12px; background-color: #ccc;">Недоступно</button>
+                    {% endif %}
+                </div>
+            </div>
+        {% empty %}
+            <p>На жаль, страв у цьому розділі не знайдено.</p>
+        {% endfor %}
+    </div>
+{% endblock %}
