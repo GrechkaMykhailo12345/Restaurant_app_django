@@ -1,0 +1,56 @@
+{% extends "restaurant_app/base.html" %}
+
+{% block title %}Історія замовлень{% endblock %}
+
+{% block content %}
+    <h1 class="my-4">Історія моїх замовлень</h1>
+
+    {% if orders %}
+        {% for order in orders %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5>Замовлення №{{ order.id }}</h5>
+                    <span class="badge bg-light text-primary fs-6">{{ order.get_status_display }}</span>
+                </div>
+                <div class="card-body">
+                    <p><strong>Дата:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</p>
+                    <p><strong>Адреса:</strong> {{ order.address }}</p>
+                    <p><strong>Спосіб оплати:</strong> {{ order.get_payment_method_display }}</p>
+
+                    <h5 class="mt-4">Деталі замовлення:</h5>
+                    <table class="table table-striped table-sm">
+                        <thead>
+                            <tr>
+                                <th>Страва</th>
+                                <th class="text-end">Кількість</th>
+                                <th class="text-end">Ціна за одиницю</th>
+                                <th class="text-end">Сума</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in order.dishes_in_order.all %}
+                                <tr>
+                                    <td>{{ item.dish.name }}</td>
+                                    <td class="text-end">{{ item.quantity }}</td>
+                                    <td class="text-end">{{ item.price }} грн</td>
+                                    <td class="text-end fw-bold">{{ item.price|floatformat:2|mul:item.quantity }} грн</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="3" class="text-end fw-bold">Загальна сума:</td>
+                                <td class="text-end fw-bold text-danger fs-5">{{ order.total_price }} грн</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <div class="card-footer text-end">
+                    <button disabled class="btn btn-outline-secondary btn-sm">Повторити замовлення</button>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p class="alert alert-info">У вас ще немає жодного завершеного замовлення.</p>
+    {% endif %}
+{% endblock %}
