@@ -27,7 +27,7 @@
             {% if dish.is_available %}
                 <form action="{% url 'cart_add' dish.id %}" method="post" class="d-grid gap-2">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-success btn-lg mt-3">🛒 Додати до кошика</button>
+                    <button type="submit" class="btn btn-success btn-lg mt-3">Додати до кошика</button>
                 </form>
             {% else %}
                 <button disabled class="btn btn-outline-danger btn-lg mt-3 d-grid gap-2">Недоступно</button>
@@ -62,7 +62,7 @@
                 <div class="card mb-3 shadow-sm">
                     <div class="card-body">
                         <h6 class="card-title">{{ review.user.username }} 
-                            <span class="badge bg-info text-dark">{{ review.rating }} ⭐</span>
+                            <span class="badge bg-info text-dark">{{ review.rating }}</span>
                         </h6>
                         <p class="card-text">{{ review.comment }}</p>
                         <small class="text-muted">Опубліковано: {{ review.created_at|date:"d.m.Y" }}</small>

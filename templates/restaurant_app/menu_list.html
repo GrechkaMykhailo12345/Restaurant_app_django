@@ -26,14 +26,12 @@
             <div class="col">
                 <div class="card h-100 shadow-sm">
                     {% if dish.image %}
-                        <a href="{% url 'dish_detail' dish.id %}">
                             <img src="{{ dish.image.url }}" class="card-img-top" alt="{{ dish.name }}" style="height: 200px; object-fit: cover;">
-                        </a>
                     {% endif %}
                     
                     <div class="card-body">
                         <small class="text-muted">{{ dish.category.name }}</small>
-                        <h5 class="card-title"><a href="{% url 'dish_detail' dish.id %}" class="text-decoration-none text-dark">{{ dish.name }}</a></h5>
+                        <h5 class="card-title"><a href="{% url 'dish_detail' dish.id %}" class="text-decoration-none">{{ dish.name }}</a></h5>
                         <p class="card-text">{{ dish.description|truncatechars:70 }}</p>
                     </div>
                     
