@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'restaurant_app',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -111,6 +112,9 @@ USE_I18N = True
 
 USE_TZ = True
 
+LOGIN_REDIRECT_URL = 'home_page'
+LOGIN_URL = 'login' 
+LOGOUT_REDIRECT_URL = 'home_page'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
