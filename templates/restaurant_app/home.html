@@ -1,13 +1,13 @@
 {% extends "restaurant_app/base.html" %}
 
-{% block title %}Головна{% endblock %}
+{% block title %}RestaurantApp{% endblock %}
 
 {% block content %}
-    <h1 class="my-4 text-center">Ласкаво просимо до нашого ресторану!</h1>
+    <h1 class="mb-4">Ласкаво просимо до нашого ресторану!</h1>
 
-    <section class="mb-5">
-        <h2 class="border-bottom pb-2 mb-3">Популярні страви</h2>
-        
+    <h2 class="mt-5 mb-3 border-bottom pb-2">Популярні страви</h2>
+    
+    {% if popular_dishes %}
         <div class="row row-cols-1 row-cols-md-3 g-4">
             {% for dish in popular_dishes %}
                 <div class="col">
@@ -15,29 +15,40 @@
                         {% if dish.image %}
                             <img src="{{ dish.image.url }}" class="card-img-top" alt="{{ dish.name }}" style="height: 200px; object-fit: cover;">
                         {% endif %}
+                        
                         <div class="card-body">
-                            <h5 class="card-title">
-                                <a href="{% url 'dish_detail' dish.id %}" class="text-decoration-none">{{ dish.name }}</a>
-                            </h5>
-                            <p class="card-text text-muted">{{ dish.description|truncatechars:70 }}</p>
+                            <small class="text-muted">{{ dish.category.name }}</small>
+                            <h5 class="card-title"><a href="{% url 'dish_detail' dish.id %}" class="text-decoration-none">{{ dish.name }}</a></h5>
+                            <p class="card-text">{{ dish.description|truncatechars:70|default:"Опис відсутній." }}</p>
                         </div>
+                        
                         <div class="card-footer d-flex justify-content-between align-items-center">
-                            <span class="fs-5 fw-bold text-danger">{{ dish.price }} грн</span>
-                            <a href="{% url 'cart_add' dish.id %}" class="btn btn-sm btn-success">В кошик</a>
+                            <span class="fs-5 fw-bold text-danger">{{ dish.price|floatformat:2 }} грн</span>
+                            
+                            {% if dish.is_available %}
+                                <form action="{% url 'cart_add' dish.id %}" method="post" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="quantity" value="1"> 
+                                    <button type="submit" class="btn btn-success btn-sm">
+                                        В кошик
+                                    </button>
+                                </form>
+                            {% else %}
+                                <button disabled class="btn btn-outline-danger btn-sm">Недоступно</button>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
-            {% empty %}
-                <p class="alert alert-info">Наразі популярних страв немає.</p>
             {% endfor %}
         </div>
-    </section>
-    
-    <hr>
+    {% else %}
+        <p class="alert alert-info">Наразі популярних страв немає.</p>
+    {% endif %}
 
-    <section>
-        <h2 class="border-bottom pb-2 mb-3">Нові пропозиції</h2>
-        
+
+    <h2 class="mt-5 mb-3 border-bottom pb-2">Нові пропозиції</h2>
+    
+    {% if new_dishes %}
         <div class="row row-cols-1 row-cols-md-3 g-4">
             {% for dish in new_dishes %}
                 <div class="col">
@@ -45,21 +56,34 @@
                         {% if dish.image %}
                             <img src="{{ dish.image.url }}" class="card-img-top" alt="{{ dish.name }}" style="height: 200px; object-fit: cover;">
                         {% endif %}
+                        
                         <div class="card-body">
-                            <h5 class="card-title">
-                                <a href="{% url 'dish_detail' dish.id %}" class="text-decoration-none">{{ dish.name }}</a>
-                            </h5>
-                            <p class="card-text text-muted">{{ dish.description|truncatechars:70 }}</p>
+                            <small class="text-muted">{{ dish.category.name }}</small>
+                            <h5 class="card-title"><a href="{% url 'dish_detail' dish.id %}" class="text-decoration-none">{{ dish.name }}</a></h5>
+                            <p class="card-text">{{ dish.description|truncatechars:70|default:"Опис відсутній." }}</p>
                         </div>
+                        
                         <div class="card-footer d-flex justify-content-between align-items-center">
-                            <span class="fs-5 fw-bold text-danger">{{ dish.price }} грн</span>
-                            <a href="{% url 'cart_add' dish.id %}" class="btn btn-sm btn-success">В кошик</a>
+                            <span class="fs-5 fw-bold text-danger">{{ dish.price|floatformat:2 }} грн</span>
+                            
+                            {% if dish.is_available %}
+                                <form action="{% url 'cart_add' dish.id %}" method="post" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="quantity" value="1"> 
+                                    <button type="submit" class="btn btn-success btn-sm">
+                                        В кошик
+                                    </button>
+                                </form>
+                            {% else %}
+                                <button disabled class="btn btn-outline-danger btn-sm">Недоступно</button>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
-            {% empty %}
-                <p class="alert alert-info">Наразі нових пропозицій немає.</p>
             {% endfor %}
         </div>
-    </section>
+    {% else %}
+        <p class="alert alert-info">Наразі нових пропозицій немає.</p>
+    {% endif %}
+
 {% endblock %}

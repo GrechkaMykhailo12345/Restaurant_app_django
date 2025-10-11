@@ -1,0 +1,63 @@
+{% extends "restaurant_app/base.html" %}
+
+{% block title %}Ваш кошик{% endblock %}
+
+{% block content %}
+    <h1 class="my-4">Ваш кошик</h1>
+
+    {% if cart_items %}
+        <table class="table table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>Страва</th>
+                    <th class="text-center">Кількість</th>
+                    <th class="text-end">Ціна за одиницю</th>
+                    <th class="text-end">Сума</th>
+                    <th>Дія</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in cart_items %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'dish_detail' item.dish.id %}" class="text-decoration-none fw-bold">
+                                {{ item.dish.name }}
+                            </a>
+                        </td>
+                        <td class="text-center">
+                            <form action="{% url 'cart_update' item.dish.id %}" method="post" class="d-inline-flex align-items-center">
+                                {% csrf_token %}
+                                <input type="number" name="quantity" value="{{ item.quantity }}" min="1" 
+                                       class="form-control text-center" style="width: 70px; margin-right: 5px;" required>
+                                <button type="submit" class="btn btn-sm btn-outline-primary">Оновити</button>
+                            </form>
+                        </td>
+                        <td class="text-end">{{ item.price|floatformat:2 }} грн</td>
+                        <td class="text-end fw-bold">{{ item.total|floatformat:2 }} грн</td>
+                        <td>
+                            <a href="{% url 'cart_remove' item.dish.id %}" class="btn btn-sm btn-outline-danger">Видалити</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3" class="text-end fw-bold fs-5">Загальна вартість:</td>
+                    <td class="text-end fw-bold fs-4 text-danger">{{ total_price|floatformat:2 }} грн</td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+        
+        <div class="text-end mt-4">
+            <a href="{% url 'menu_list' %}" class="btn btn-outline-secondary me-2">Продовжити покупки</a>
+            <a href="{% url 'order_create' %}" class="btn btn-success">Оформити замовлення</a>
+        </div>
+        
+    {% else %}
+        <div class="alert alert-info" role="alert">
+            Ваш кошик порожній.
+        </div>
+        <a href="{% url 'menu_list' %}" class="btn btn-primary">Перейти до меню</a>
+    {% endif %}
+{% endblock %}

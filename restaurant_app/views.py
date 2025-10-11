@@ -2,9 +2,43 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Avg
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.views.decorators.http import require_POST
 from decimal import Decimal
 from .models import Dish, Category, Review, Order, DishesinOrder
 from .forms import ReviewForm, OrderCreateForm
+
+def get_cart_data(request):
+    cart = request.session.get('cart', {})
+    cart_items = []
+    total_price = Decimal('0.00')
+
+    dish_ids = [int(id) for id in cart.keys()]
+    
+    dishes = Dish.objects.filter(id__in=dish_ids)
+    dishes_map = {dish.id: dish for dish in dishes}
+
+    for dish_id_str, item in cart.items():
+        dish_id_int = int(dish_id_str)
+        
+        if dish_id_int in dishes_map:
+            dish = dishes_map[dish_id_int]
+            
+            try:
+                price = Decimal(item['price'])
+                quantity = int(item['quantity'])
+                item_total = price * quantity
+                total_price += item_total
+                
+                cart_items.append({
+                    'dish': dish,
+                    'quantity': quantity,
+                    'price': price,
+                    'total': item_total
+                })
+            except (ValueError, TypeError):
+                continue
+
+    return {'cart_items': cart_items, 'total_price': total_price}
 
 def home_page(request):
     popular_dishes = Dish.objects.filter(is_popular=True, is_available=True)[:5]
@@ -78,26 +112,69 @@ def order_history(request):
     
     return render(request, 'restaurant_app/order_history.html', {'orders': orders})
 
-def cart_detail(request):
-    messages.info(request, "Функціонал кошика буде реалізовано пізніше.")
-    return redirect('home_page')
 
+def cart_detail(request):
+    cart_data = get_cart_data(request)
+    return render(request, 'restaurant_app/cart_detail.html', cart_data)
+
+@require_POST
 def cart_add(request, dish_id):
-    messages.info(request, "Додавання в кошик ще не реалізовано.")
-    return redirect('home_page')
+    dish = get_object_or_404(Dish, id=dish_id)
+    cart = request.session.get('cart', {})
+    
+    try:
+        quantity = int(request.POST.get('quantity', 1))
+        if quantity <= 0:
+            quantity = 1
+    except ValueError:
+        quantity = 1
+
+    dish_id_str = str(dish_id)
+
+    if dish_id_str in cart:
+        cart[dish_id_str]['quantity'] += quantity
+    else:
+        cart[dish_id_str] = {
+            'quantity': quantity,
+            'price': str(dish.price) 
+        }
+
+    request.session['cart'] = cart
+    return redirect('cart_detail') 
+
+@require_POST
+def cart_update(request, dish_id):
+    cart = request.session.get('cart', {})
+    dish_id_str = str(dish_id)
+    
+    if dish_id_str in cart:
+        try:
+            new_quantity = int(request.POST.get('quantity'))
+            
+            if new_quantity > 0:
+                cart[dish_id_str]['quantity'] = new_quantity
+            else:
+                del cart[dish_id_str]
+                
+        except (ValueError, TypeError):
+            pass 
+    
+    request.session['cart'] = cart
+    return redirect('cart_detail')
 
 def cart_remove(request, dish_id):
-    messages.info(request, "Видалення з кошика ще не реалізовано.")
-    return redirect('home_page')
+    cart = request.session.get('cart', {})
+    dish_id_str = str(dish_id)
 
-def cart_update(request, dish_id):
-    messages.info(request, "Оновлення кошика ще не реалізовано.")
-    return redirect('home_page')
+    if dish_id_str in cart:
+        del cart[dish_id_str]
+        
+    request.session['cart'] = cart
+    return redirect('cart_detail')
+
 
 def order_create(request):
-    messages.info(request, "Оформлення замовлення буде реалізовано пізніше.")
-    return redirect('home_page')
+    return redirect('cart_detail')
 
 def order_confirmation(request, order_id):
-    messages.info(request, f"Замовлення №{order_id} успішно створено.")
     return redirect('home_page')

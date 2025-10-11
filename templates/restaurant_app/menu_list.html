@@ -3,7 +3,7 @@
 {% block title %}Меню Ресторану{% endblock %}
 
 {% block content %}
-    <h1 class="mb-4">Меню Ресторану</h1>
+    <h1 class="mb-4">Меню ресторану</h1>
 
     <div class="category-filter mb-4 border-bottom pb-3">
         <h3>Фільтр за категорією:</h3>
@@ -39,9 +39,13 @@
                         <span class="fs-5 fw-bold text-danger">{{ dish.price }} грн</span>
                         
                         {% if dish.is_available %}
-                            <a href="{% url 'cart_add' dish.id %}" class="btn btn-success btn-sm">
-                                Додати до кошика
-                            </a>
+                            <form action="{% url 'cart_add' dish.id %}" method="post" class="d-inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="quantity" value="1"> 
+                                <button type="submit" class="btn btn-success btn-sm">
+                                    Додати до кошика
+                                </button>
+                            </form>
                         {% else %}
                             <button disabled class="btn btn-outline-danger btn-sm">Недоступно</button>
                         {% endif %}

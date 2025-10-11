@@ -32,15 +32,22 @@
                                 <tr>
                                     <td>{{ item.dish.name }}</td>
                                     <td class="text-end">{{ item.quantity }}</td>
-                                    <td class="text-end">{{ item.price }} грн</td>
-                                    <td class="text-end fw-bold">{{ item.price|floatformat:2|mul:item.quantity }} грн</td>
+                                    <td class="text-end">{{ item.price|floatformat:2 }} грн</td>
+                                    <td class="text-end fw-bold">
+                                        {% with item.price|floatformat:2 as price_f %}
+                                            {% with item.quantity as quantity_i %}
+                                                {{ price_f|stringformat:"f" }}
+                                                {{ item.get_total_price|default_if_none:item.price }} грн
+                                            {% endwith %}
+                                        {% endwith %}
+                                    </td>
                                 </tr>
                             {% endfor %}
                         </tbody>
                         <tfoot>
                             <tr>
                                 <td colspan="3" class="text-end fw-bold">Загальна сума:</td>
-                                <td class="text-end fw-bold text-danger fs-5">{{ order.total_price }} грн</td>
+                                <td class="text-end fw-bold text-danger fs-5">{{ order.total_price|floatformat:2 }} грн</td>
                             </tr>
                         </tfoot>
                     </table>
