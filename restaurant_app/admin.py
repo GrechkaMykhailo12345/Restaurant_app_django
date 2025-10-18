@@ -28,6 +28,6 @@ class DishesinOrderInline(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('user', 'full_name', 'phone_number', 'status', 'total_price', 'created_at')
+    list_display = ('user', 'first_name', 'last_name', 'email', 'phone_number', 'status', 'total_price', 'created_at')
     list_filter = ('status', 'payment_method')
     inlines = [DishesinOrderInline]

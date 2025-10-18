@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 from decimal import Decimal
+from django.db import transaction
 from .models import Dish, Category, Review, Order, DishesinOrder
 from .forms import ReviewForm, OrderCreateForm
 
@@ -173,8 +174,68 @@ def cart_remove(request, dish_id):
     return redirect('cart_detail')
 
 
+@login_required
 def order_create(request):
-    return redirect('cart_detail')
+    cart_data = get_cart_data(request)
+    cart_items = cart_data['cart_items']
+    total_price = cart_data['total_price']
 
+    if not cart_items:
+        return redirect('menu_list')
+
+    if request.method == 'POST':
+        form = OrderCreateForm(request.POST)
+        if form.is_valid():
+            
+            full_name = form.cleaned_data.pop('full_name')
+            email = form.cleaned_data.pop('email')
+
+            with transaction.atomic():
+                order = form.save(commit=False)
+                order.user = request.user
+                order.total_price = total_price
+
+                existing_comment = form.cleaned_data.get('comment', '')
+                
+                order.comment = (f"Повне ім'я: {full_name}\n"
+                                 f"Email: {email}\n"
+                                 f"Додатковий коментар: {existing_comment}")
+                
+                order.save()
+                
+                for item in cart_items:
+                    DishesinOrder.objects.create(
+                        order=order,
+                        dish=item['dish'],
+                        price=item['price'],
+                        quantity=item['quantity'],
+                        total_price=item['total'] 
+                    )
+
+                request.session['cart'] = {}
+                return redirect('order_confirmation', order_id=order.id)
+    
+    else:
+        initial_data = {
+            'first_name': request.user.first_name,
+            'last_name': request.user.last_name,
+            'email': request.user.email,
+        }
+        form = OrderCreateForm(initial=initial_data)
+
+    return render(request, 'restaurant_app/order_create.html', {
+        'cart_items': cart_items,
+        'total_price': total_price,
+        'form': form
+    })
+
+@login_required
 def order_confirmation(request, order_id):
-    return redirect('home_page')
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    try:
+        order = Order.objects.filter(id=order_id).prefetch_related('dishesinorder_set__dish').first()
+    except Exception as e:
+        print(f"Помилка prefetch: {e}") 
+        order = get_object_or_404(Order, id=order_id, user=request.user)
+        
+    return render(request, 'restaurant_app/order_confirmation.html', {'order': order})

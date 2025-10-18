@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from decimal import Decimal
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
@@ -35,7 +36,9 @@ class Review(models.Model):
 
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    full_name = models.CharField(max_length=255)
+    first_name = models.CharField(max_length=50, verbose_name="Ім'я", default='')
+    last_name = models.CharField(max_length=50, verbose_name="Прізвище", default='')
+    email = models.EmailField(default='')
     phone_number = models.CharField(max_length=20)
     address = models.CharField(max_length=255)
     PAYMENT_CHOICES = [
@@ -57,10 +60,11 @@ class Order(models.Model):
         return f'Замовлення №{self.id} від {self.user.username}'
 
 class DishesinOrder(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='dishes')
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
     dish = models.ForeignKey(Dish, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
     price = models.DecimalField(max_digits=6, decimal_places=2)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
     
     def __str__(self):
         return f'{self.quantity} x {self.dish.name} для замовлення #{self.order.id}'

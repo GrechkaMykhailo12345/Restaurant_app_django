@@ -1,0 +1,67 @@
+{% extends "restaurant_app/base.html" %}
+
+{% block title %}Оформлення замовлення{% endblock %}
+
+{% block content %}
+    <h1 class="my-4">Оформлення замовлення</h1>
+
+    <div class="row">
+        <div class="col-md-7">
+            <h2 class="h4 border-bottom pb-2">Контактна інформація та доставка</h2>
+            <form method="post">
+                {% csrf_token %}
+                
+                {% for field in form %}
+                    {% if field.name != 'payment_method' %}
+                        <div class="mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <div class="text-danger small">{{ field.errors }}</div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+
+                <h2 class="h4 border-bottom pb-2 mt-4">Спосіб оплати</h2>
+                <div class="mb-3">
+                    {{ form.payment_method.label_tag }}
+                    <div class="mt-2">
+                        {% for radio in form.payment_method %}
+                            <div class="form-check form-check-inline">
+                                {{ radio.tag }}
+                                <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% if form.payment_method.errors %}
+                        <div class="text-danger small">{{ form.payment_method.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="d-grid gap-2 mt-5">
+                    <button type="submit" class="btn btn-success btn-lg">Підтвердити замовлення</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="col-md-5">
+            <h2 class="h4 border-bottom pb-2">Ваше замовлення</h2>
+            <ul class="list-group mb-3">
+                {% for item in cart_items %}
+                    <li class="list-group-item d-flex justify-content-between lh-sm">
+                        <div>
+                            <h6 class="my-0">{{ item.dish.name }}</h6>
+                            <small class="text-muted">Кількість: {{ item.quantity }} x {{ item.price|floatformat:2 }} грн</small>
+                        </div>
+                        <span class="text-muted fw-bold">{{ item.total|floatformat:2 }} грн</span>
+                    </li>
+                {% endfor %}
+                <li class="list-group-item d-flex justify-content-between bg-light">
+                    <div class="fw-bold">Загальна сума до оплати</div>
+                    <strong class="fs-5 text-danger">{{ total_price|floatformat:2 }} грн</strong>
+                </li>
+            </ul>
+        </div>
+    </div>
+{% endblock %}
