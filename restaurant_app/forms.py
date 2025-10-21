@@ -10,10 +10,8 @@ class ReviewForm(forms.ModelForm):
         }
 
 class OrderCreateForm(forms.ModelForm):
-    full_name = forms.CharField(max_length=100, label="Повне ім'я (Ім'я та Прізвище)", 
-                                widget=forms.TextInput(attrs={'class': 'form-control'}))
     email = forms.EmailField(label="Електронна пошта", 
-                             widget=forms.EmailInput(attrs={'class': 'form-control'}))
+        widget=forms.EmailInput(attrs={'class': 'form-control'}))
 
     PAYMENT_CHOICES = [
         ('cash', 'Готівка при отриманні'),
@@ -36,8 +34,16 @@ class OrderCreateForm(forms.ModelForm):
     class Meta:
         model = Order
         fields = ['first_name', 'last_name', 'phone_number', 'email', 'address', 'payment_method', 'comment']
+        labels = {
+            'first_name': "Ім'я",
+            'last_name': "Прізвище",
+            'phone_number': "Номер телефону",
+            'email': "Електронна пошта",
+            'address': "Адреса доставки",
+        }
         widgets = {
             'address': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
+            'comment': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
         }
 
     def __init__(self, *args, **kwargs):

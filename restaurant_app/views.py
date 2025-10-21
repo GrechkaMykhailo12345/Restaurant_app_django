@@ -186,8 +186,6 @@ def order_create(request):
     if request.method == 'POST':
         form = OrderCreateForm(request.POST)
         if form.is_valid():
-            
-            full_name = form.cleaned_data.pop('full_name')
             email = form.cleaned_data.pop('email')
 
             with transaction.atomic():
@@ -195,11 +193,10 @@ def order_create(request):
                 order.user = request.user
                 order.total_price = total_price
 
-                existing_comment = form.cleaned_data.get('comment', '')
+                comment = form.cleaned_data.get('comment', '')
                 
-                order.comment = (f"Повне ім'я: {full_name}\n"
-                                 f"Email: {email}\n"
-                                 f"Додатковий коментар: {existing_comment}")
+                order.comment = (f"Email: {email}\n"
+                                 f"Додатковий коментар: {comment}")
                 
                 order.save()
                 
