@@ -186,17 +186,11 @@ def order_create(request):
     if request.method == 'POST':
         form = OrderCreateForm(request.POST)
         if form.is_valid():
-            email = form.cleaned_data.pop('email')
-
+            
             with transaction.atomic():
                 order = form.save(commit=False)
                 order.user = request.user
                 order.total_price = total_price
-
-                comment = form.cleaned_data.get('comment', '')
-                
-                order.comment = (f"Email: {email}\n"
-                                 f"Додатковий коментар: {comment}")
                 
                 order.save()
                 
@@ -225,7 +219,6 @@ def order_create(request):
         'total_price': total_price,
         'form': form
     })
-
 @login_required
 def order_confirmation(request, order_id):
     order = get_object_or_404(Order, id=order_id, user=request.user)
