@@ -66,6 +66,7 @@
                 </div>
                 
                 <div class="card-footer text-end">
+                    <a href="{% url 'order_repeat' order.id %}" class="btn btn-warning btn-sm">Повторити замовлення</a>
                     <a href="{% url 'order_confirmation' order.id %}" class="btn btn-info btn-sm">Переглянути деталі</a>
                 </div>
             </div>

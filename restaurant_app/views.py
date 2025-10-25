@@ -219,6 +219,7 @@ def order_create(request):
         'total_price': total_price,
         'form': form
     })
+
 @login_required
 def order_confirmation(request, order_id):
     order = get_object_or_404(Order, id=order_id, user=request.user)
@@ -229,3 +230,19 @@ def order_confirmation(request, order_id):
         order = get_object_or_404(Order, id=order_id, user=request.user)
         
     return render(request, 'restaurant_app/order_confirmation.html', {'order': order})
+
+@login_required
+def order_repeat(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    order_items = order.dishesinorder_set.all()
+    cart = {}
+    
+    for item in order_items:
+        dish_id = str(item.dish.id)
+
+        cart[dish_id] = {
+            'quantity': item.quantity,
+            'price': str(item.price),
+        }
+    request.session['cart'] = cart
+    return redirect('cart_detail')
