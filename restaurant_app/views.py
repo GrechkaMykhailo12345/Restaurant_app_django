@@ -6,7 +6,7 @@ from django.views.decorators.http import require_POST
 from decimal import Decimal
 from django.db import transaction
 from .models import Dish, Category, Review, Order, DishesinOrder
-from .forms import ReviewForm, OrderCreateForm
+from .forms import ReviewForm, OrderCreateForm, UserProfileEditForm
 
 def get_cart_data(request):
     cart = request.session.get('cart', {})
@@ -246,3 +246,20 @@ def order_repeat(request, order_id):
         }
     request.session['cart'] = cart
     return redirect('cart_detail')
+
+@login_required
+def profile_view(request):
+    """Відображає сторінку профілю користувача."""
+    return render(request, 'restaurant_app/profile.html')
+
+@login_required
+def profile_edit(request):   
+    if request.method == 'POST':
+        form = UserProfileEditForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect('profile')
+    else:
+        form = UserProfileEditForm(instance=request.user)
+        
+    return render(request, 'restaurant_app/profile_edit.html', {'form': form})

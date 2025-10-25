@@ -1,5 +1,8 @@
 from django import forms
 from .models import Review, Order
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 class ReviewForm(forms.ModelForm):
     class Meta:
@@ -50,3 +53,17 @@ class OrderCreateForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         for field_name in ['phone_number']:
              self.fields[field_name].widget.attrs.update({'class': 'form-control'})
+
+class UserProfileEditForm(forms.ModelForm):
+    first_name = forms.CharField(label="Ім'я", max_length=150)
+    last_name = forms.CharField(label="Прізвище", max_length=150)
+    email = forms.EmailField(label="Електронна пошта")
+
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name', 'email')
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs.update({'class': 'form-control'})
