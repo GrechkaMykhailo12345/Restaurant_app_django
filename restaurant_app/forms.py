@@ -10,6 +10,7 @@ class ReviewForm(forms.ModelForm):
         fields = ['rating', 'comment']
         widgets = {
             'comment': forms.Textarea(attrs={'rows': 4, 'class': 'form-control'}),
+            'rating': forms.Select(attrs={'class': 'form-select'}),
         }
 
 class OrderCreateForm(forms.ModelForm):
@@ -51,8 +52,8 @@ class OrderCreateForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field_name in ['phone_number']:
-             self.fields[field_name].widget.attrs.update({'class': 'form-control'})
+        for field_name in ['first_name', 'last_name', 'phone_number', 'address', 'comment', 'email']:
+            self.fields[field_name].widget.attrs.update({'class': 'form-control'})
 
 class UserProfileEditForm(forms.ModelForm):
     first_name = forms.CharField(label="Ім'я", max_length=150)

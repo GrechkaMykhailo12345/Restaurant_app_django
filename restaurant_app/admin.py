@@ -1,18 +1,19 @@
 from django.contrib import admin
+from unfold.admin import ModelAdmin
 from .models import Category, Dish, Review, Order, DishesinOrder
 
 @admin.register(Category)
-class CategoryAdmin(admin.ModelAdmin):
+class CategoryAdmin(ModelAdmin):
     list_display = ('name', 'description')
 
 @admin.register(Dish)
-class DishAdmin(admin.ModelAdmin):
+class DishAdmin(ModelAdmin):
     list_display = ('name', 'category', 'price', 'is_available', 'is_popular')
     list_filter = ('category', 'is_available', 'is_popular')
     search_fields = ('name', 'description')
 
 @admin.register(Review)
-class ReviewAdmin(admin.ModelAdmin):
+class ReviewAdmin(ModelAdmin):
     list_display = ('user', 'dish', 'rating', 'created_at', 'is_approved')
     list_filter = ('is_approved', 'rating')
     search_fields = ('user__username', 'comment')
@@ -27,7 +28,7 @@ class DishesinOrderInline(admin.TabularInline):
     extra = 0
 
 @admin.register(Order)
-class OrderAdmin(admin.ModelAdmin):
+class OrderAdmin(ModelAdmin):
     list_display = ('user', 'first_name', 'last_name', 'email', 'phone_number', 'status', 'total_price', 'created_at')
     list_filter = ('status', 'payment_method')
     inlines = [DishesinOrderInline]

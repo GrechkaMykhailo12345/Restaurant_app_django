@@ -3,11 +3,15 @@ from django.contrib.auth.models import User
 from decimal import Decimal
 
 class Category(models.Model):
-    name = models.CharField(max_length=100)
-    description = models.TextField(blank=True, null=True)
+    name = models.CharField(max_length=100, verbose_name='Назва категорії')
+    description = models.TextField(blank=True, null=True, verbose_name='опис категорії')
 
     def __str__(self):
         return self.name
+    
+    class Meta:
+        verbose_name = 'Категорія'
+        verbose_name_plural = 'Категорії'
 
 class Dish(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='dishes')
@@ -22,6 +26,10 @@ class Dish(models.Model):
 
     def __str__(self):
         return self.name
+    
+    class Meta:
+        verbose_name = 'Страва'
+        verbose_name_plural = 'Страви'
 
 class Review(models.Model):
     dish = models.ForeignKey(Dish, on_delete=models.CASCADE, related_name='reviews')
@@ -33,6 +41,10 @@ class Review(models.Model):
 
     def __str__(self):
         return f'Відгук на {self.dish.name} від {self.user.username}'
+    
+    class Meta:
+        verbose_name='Відгук'
+        verbose_name_plural = 'Відгуки'
 
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -59,6 +71,10 @@ class Order(models.Model):
 
     def __str__(self):
         return f'Замовлення №{self.id} від {self.user.username}'
+    
+    class Meta:
+        verbose_name = 'Користувач'
+        verbose_name_plural = 'Користувачі'
 
 class DishesinOrder(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
