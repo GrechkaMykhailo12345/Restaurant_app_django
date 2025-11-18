@@ -1,0 +1,78 @@
+{% extends "restaurant_app/base.html" %}
+
+{% block title %}Історія замовлень{% endblock %}
+
+{% block content %}
+    <h1 class="my-4">Історія моїх замовлень</h1>
+
+    {% if orders %}
+        {% for order in orders %}
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <div>
+                        Замовлення
+                        <span class="badge bg-light text-primary fs-6 ms-2">{{ order.get_status_display }}</span>
+                    </div>
+                    <small>Дата: {{ order.created_at|date:"d.m.Y" }}</small>
+                </div>
+                
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p class="mb-1"><strong>Отримувач:</strong> {{ order.first_name }} {{ order.last_name }} </p>
+                            <p class="mb-1"><strong>Телефон:</strong> {{ order.phone_number }}</p>
+                            <p class="mb-1"><strong>Email:</strong> {{ order.email }}</p>
+                            <p class="mb-1"><strong>Адреса:</strong> {{ order.address }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-1"><strong>Спосіб оплати:</strong> 
+                                {% if order.payment_method == 'cash' %} Готівка при отриманні
+                                {% elif order.payment_method == 'online' %} Онлайн оплата
+                                {% else %} Не вказано
+                                {% endif %}
+                            </p>
+                            <p class="mb-1"><strong>Коментар:</strong> {{ order.comment|default:"-" }}</p>
+                        </div>
+                    </div>
+
+                    <h5 class="mt-4 border-top pt-3">Замовлені страви:</h5>
+                    <table class="table table-striped table-sm">
+                        <thead>
+                            <tr>
+                                <th>Страва</th>
+                                <th class="text-end">Кількість</th>
+                                <th class="text-end">Ціна за одиницю</th>
+                                <th class="text-end">Сума</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in order.dishesinorder_set.all %}
+                                <tr>
+                                    <td>{{ item.dish.name }}</td>
+                                    <td class="text-end">{{ item.quantity }}</td>
+                                    <td class="text-end">{{ item.price|floatformat:2 }} грн</td>
+                                    
+                                    <td class="text-end fw-bold">{{ item.total_price|floatformat:2 }} грн</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="3" class="text-end fw-bold">Загальна сума:</td>
+                                <td class="text-end fw-bold text-danger fs-5">{{ order.total_price|floatformat:2 }} грн</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                
+                <div class="card-footer text-end">
+                    <a href="{% url 'order_repeat' order.id %}" class="btn btn-warning btn-sm">Повторити замовлення</a>
+                    <a href="{% url 'order_confirmation' order.id %}" class="btn btn-info btn-sm">Переглянути деталі</a>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p class="alert alert-info">У вас ще немає жодного замовлення.</p>
+        <a href="{% url 'menu_list' %}" class="btn btn-primary">Перейти до меню</a>
+    {% endif %}
+{% endblock %}

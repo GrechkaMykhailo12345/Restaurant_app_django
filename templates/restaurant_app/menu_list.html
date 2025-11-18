@@ -1,0 +1,59 @@
+{% extends "restaurant_app/base.html" %}
+
+{% block title %}Меню Ресторану{% endblock %}
+
+{% block content %}
+    <h1 class="mb-4">Меню ресторану</h1>
+
+    <div class="category-filter mb-4 border-bottom pb-3">
+        <h3>Фільтр за категорією:</h3>
+        
+        <a href="{% url 'menu_list' %}" 
+           class="category-link btn btn-sm {% if not selected_category %}active-category{% else %}btn-outline-secondary{% endif %}">
+            Усі
+        </a>
+        
+        {% for category in categories %}
+            <a href="{% url 'menu_list' %}?category={{ category.id }}" 
+               class="category-link btn btn-sm {% if category.id|stringformat:"s" == selected_category|stringformat:"s" %}active-category{% else %}btn-outline-secondary{% endif %}">
+                {{ category.name }}
+            </a>
+        {% endfor %}
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for dish in dishes %}
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    {% if dish.image %}
+                            <img src="{{ dish.image.url }}" class="card-img-top" alt="{{ dish.name }}" style="height: 200px; object-fit: cover;">
+                    {% endif %}
+                    
+                    <div class="card-body">
+                        <small class="text-muted">{{ dish.category.name }}</small>
+                        <h5 class="card-title"><a href="{% url 'dish_detail' dish.id %}" class="text-decoration-none">{{ dish.name }}</a></h5>
+                        <p class="card-text">{{ dish.description|truncatechars:70 }}</p>
+                    </div>
+                    
+                    <div class="card-footer d-flex justify-content-between align-items-center">
+                        <span class="fs-5 fw-bold text-danger">{{ dish.price }} грн</span>
+                        
+                        {% if dish.is_available %}
+                            <form action="{% url 'cart_add' dish.id %}" method="post" class="d-inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="quantity" value="1"> 
+                                <button type="submit" class="btn btn-success btn-sm">
+                                    Додати до кошика
+                                </button>
+                            </form>
+                        {% else %}
+                            <button disabled class="btn btn-outline-danger btn-sm">Недоступно</button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <p class="alert alert-info">На жаль, страв у цьому розділі не знайдено.</p>
+        {% endfor %}
+    </div>
+{% endblock %}

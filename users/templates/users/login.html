@@ -1,0 +1,40 @@
+{% extends "restaurant_app/base.html" %}
+
+{% block title %}Вхід{% endblock %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm p-4">
+                <h2 class="card-title text-center mb-4">Вхід</h2>
+                
+                {% if form.errors %}
+                    <div class="alert alert-danger" role="alert">
+                        Ваше ім'я користувача та/або пароль невірні. Будь ласка, спробуйте ще раз.
+                    </div>
+                {% endif %}
+
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    {% for field in form %}
+                        <div class="mb-3">
+                            <label class="form-label">{{ field.label_tag }}</label>
+                            {{ field }} 
+                            {% for error in field.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-success btn-lg mt-3">Увійти</button>
+                    </div>
+                </form>
+                <div class="border-top pt-3 mt-3 text-center">
+                    Не маєте акаунту? <a href="{% url 'register' %}">Зареєструватися</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

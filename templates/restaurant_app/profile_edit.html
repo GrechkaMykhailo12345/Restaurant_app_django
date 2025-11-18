@@ -1,0 +1,21 @@
+{% extends "restaurant_app/base.html" %}
+
+{% block title %}Редагування профілю{% endblock %}
+
+{% block content %}
+    <h1 class="my-4">Редагування профілю</h1>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            Зміна особистих даних
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-success">Зберегти зміни</button>
+                <a href="{% url 'profile' %}" class="btn btn-outline-secondary ms-2">Скасувати</a>
+            </form>
+        </div>
+    </div>
+{% endblock %}
