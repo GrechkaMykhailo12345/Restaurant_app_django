@@ -30,5 +30,4 @@ EXPOSE 8000
 # 9. Запускаємо Gunicorn
 # Замініть 'myproject' на назву вашої папки з settings.py
 CMD python manage.py migrate && \
-    python create_superuser.py && \
     gunicorn restaurant_project.wsgi:application --bind 0.0.0.0:8000
